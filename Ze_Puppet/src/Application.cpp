@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "Renderer.h"
+#include "VertexBuffer.h"
 
 int main(void)
 {
