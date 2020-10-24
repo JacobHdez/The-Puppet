@@ -1,4 +1,14 @@
-.vs
-Debug
-Ze_Puppet/Debug
-Dependencies/GLEW/doc
+# Directories
+**Debug/
+**bin/
+**doc/
+
+# Files
+*.user
+
+# Visual Studio
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
