@@ -6,6 +6,7 @@
 #include "Renderer.h"
 
 #include "VertexBuffer.h"
+#include "VertexBufferLayout.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "Shader.h"
@@ -41,7 +42,7 @@ int main(void)
         while (!glfwWindowShouldClose(window))
         {
             /* Render here */
-            GLCall(glClear(GL_COLOR_BUFFER_BIT));
+            GLCall(glClear(GL_COLOR_BUFFER_BIT)); // renderer.Clear()
 
             /* ---------- Code ---------- */
             /* ---------- End ---------- */
