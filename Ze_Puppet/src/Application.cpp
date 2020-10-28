@@ -95,7 +95,17 @@ int main(void)
         float r = 0.0f;
         float increment = 0.05f;
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        //GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)); // W
+        //GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
+
+        // Habilidad el test de profundidad
+        GLCall(glEnable(GL_DEPTH_TEST));
+        // Aceptar el fragmento si está más cerca de la cámara que el fragmento anterior
+        GLCall(glDepthFunc(GL_LESS));
+        // Cull triangles which normal is not towards the camera
+        //GLCall(glEnable(GL_CULL_FACE));
+
 
         while (!glfwWindowShouldClose(window) && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
         {
@@ -148,7 +158,6 @@ GLFWwindow* Init_GLFW()
     glfwMakeContextCurrent(window);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
