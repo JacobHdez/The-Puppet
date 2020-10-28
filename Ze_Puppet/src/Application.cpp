@@ -14,6 +14,10 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 #include "Util/Camera.h"
 
 /* ---------- Settings ---------- */
@@ -30,6 +34,8 @@ bool firstMouse = true;
 /* ---------- End ---------- */
 
 GLFWwindow* Init_GLFW();
+void Init_GLEW();
+void Init_IMGUI();
 
 void processInput(GLFWwindow* window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -165,12 +171,28 @@ GLFWwindow* Init_GLFW()
 
     glfwSwapInterval(5);
 
+    Init_GLEW();
+
+    return window;
+}
+
+void Init_GLEW()
+{
     if (glewInit() != GLEW_OK)
         std::cout << "[-] Error glewInit()" << std::endl;
 
     std::cout << glGetString(GL_VERSION) << std::endl;
+}
 
-    return window;
+void Init_IMGUI(GLFWwindow* window)
+{
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
 void processInput(GLFWwindow* window)
