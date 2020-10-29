@@ -15,10 +15,12 @@ private:
 	float Near;
 	float Far;
 
+	bool press = false;
+
 	float yaw = -90.0f;
 	float pitch = 0.0f;
 
-	float speed;
+	float speed = 0.1f;
 public:
 	Camera();
 	Camera(const glm::vec3& pos, float fov, float aspect, float zNear, float zFar);
@@ -28,4 +30,5 @@ public:
 	void ProcessKeyboard(unsigned int key);
 	void ProcessMouseMovement(float xoffset, float yoffset);
 	void ProcessMouseScroll(float xoffset, float yoffset);
+	void ProcessMouseButton(int button, int action);
 };

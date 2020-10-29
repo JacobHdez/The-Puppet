@@ -35,7 +35,7 @@ bool firstMouse = true;
 
 GLFWwindow* Init_GLFW();
 void Init_GLEW();
-void Init_IMGUI();
+void Init_IMGUI(GLFWwindow* window);
 
 void processInput(GLFWwindow* window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -48,6 +48,8 @@ int main(void)
     GLFWwindow* window = Init_GLFW();
     if (window == nullptr)
         return -1;
+
+    Init_GLEW();
 
     {
         /* ---------- TEST ---------- */
@@ -98,26 +100,33 @@ int main(void)
 
         Renderer renderer;
 
+        /* ---------- imgui ---------- */
+        Init_IMGUI(window);
+        bool show_demo_window = true;
+        /* ---------- End ---------- */
+
         float r = 0.0f;
         float increment = 0.05f;
-
 
         //GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)); // W
         //GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
 
         // Habilidad el test de profundidad
-        GLCall(glEnable(GL_DEPTH_TEST));
+        //GLCall(glEnable(GL_DEPTH_TEST));
         // Aceptar el fragmento si está más cerca de la cámara que el fragmento anterior
-        GLCall(glDepthFunc(GL_LESS));
+        //GLCall(glDepthFunc(GL_LESS));
         // Cull triangles which normal is not towards the camera
         //GLCall(glEnable(GL_CULL_FACE));
-
 
         while (!glfwWindowShouldClose(window) && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
         {
             processInput(window);
 
             renderer.Clear();
+
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
 
             shader.Bind();
             shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
@@ -137,11 +146,21 @@ int main(void)
 
             r += increment;
 
+            {
+
+            }
+
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
             glfwSwapBuffers(window);
             glfwPollEvents();
         }
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     glfwTerminate();
     return 0;
@@ -163,15 +182,13 @@ GLFWwindow* Init_GLFW()
 
     glfwMakeContextCurrent(window);
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     glfwSwapInterval(5);
-
-    Init_GLEW();
 
     return window;
 }
@@ -189,10 +206,10 @@ void Init_IMGUI(GLFWwindow* window)
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
-    ImGui::StyleColorsDark();
-
     ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
+    //ImGui_ImplOpenGL3_Init(glsl_version);
+
+    ImGui::StyleColorsDark();
 }
 
 void processInput(GLFWwindow* window)
@@ -237,5 +254,6 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
-    std::cout << button << " - " << action << " - " << mods << std::endl;
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
+        camera.ProcessMouseButton(button, action);
 }

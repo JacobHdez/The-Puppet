@@ -4,9 +4,10 @@
 #include "glm/gtx/transform.hpp"
 
 #include "KeyCodes.h"
+#include "MouseButtonCodes.h"
 
 Camera::Camera()
-	: FoV(glm::pi<float>() * 0.25f), Aspect(4.0f / 3.0f), Near(0.1f), Far(100.0f), speed(0.1f)
+	: FoV(glm::pi<float>() * 0.25f), Aspect(4.0f / 3.0f), Near(0.1f), Far(100.0f)
 {
 	//m_Perspective = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
 	m_Perspective = glm::perspective(FoV, Aspect, Near, Far);
@@ -16,7 +17,7 @@ Camera::Camera()
 }
 
 Camera::Camera(const glm::vec3& pos, float fov, float aspect, float zNear, float zFar)
-	: FoV(fov), Aspect(aspect), Near(zNear), Far(zFar), speed(0.1f)
+	: FoV(fov), Aspect(aspect), Near(zNear), Far(zFar)
 {
 	m_Perspective = glm::perspective(fov, aspect, zNear, zFar);
 	m_Position = pos;
@@ -51,6 +52,9 @@ void Camera::ProcessKeyboard(unsigned int key)
 
 void Camera::ProcessMouseMovement(float xoffset, float yoffset)
 {
+	if (!press)
+		return;
+
 	yaw += xoffset * 0.1f;
 	pitch += yoffset * 0.1f;
 	if (pitch > 89.0f)
@@ -69,4 +73,12 @@ void Camera::ProcessMouseScroll(float xoffset, float yoffset)
 {
 	m_Position += m_Right * (yoffset * speed);
 	FoV += xoffset * speed;
+}
+
+void Camera::ProcessMouseButton(int button, int action)
+{
+	if (action == MOUSE_RELEASE)
+		press = false;
+	else if (action == MOUSE_PRESS)
+		press = true;
 }
