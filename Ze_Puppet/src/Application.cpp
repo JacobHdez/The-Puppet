@@ -20,28 +20,16 @@
 
 #include "Util/Camera.h"
 
+#include "tests/TestClearColor.h"
+
 /* ---------- Settings ---------- */
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 /* ---------- End ---------- */
 
-/* ---------- Camera ---------- */
-Camera camera;
-glm::mat4 MVP = camera.GetViewProjection();
-float lastX = SCR_WIDTH / 2.0f;
-float lastY = SCR_HEIGHT / 2.0f;
-bool firstMouse = true;
-/* ---------- End ---------- */
-
 GLFWwindow* Init_GLFW();
 void Init_GLEW();
 void Init_IMGUI(GLFWwindow* window);
-
-void processInput(GLFWwindow* window);
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void mouse_callback(GLFWwindow* window, double xpos, double ypos);
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
 int main(void)
 {
@@ -52,103 +40,27 @@ int main(void)
     Init_GLEW();
 
     {
-        /* ---------- TEST ---------- */
-        float positions[] = {
-            -1.0f, -1.0f, -1.0f, // 0
-             1.0f, -1.0f, -1.0f, // 1
-             1.0f,  1.0f, -1.0f, // 2
-             1.0f,  1.0f,  1.0f, // 3
-            -1.0f,  1.0f,  1.0f, // 4
-            -1.0f, -1.0f,  1.0f, // 5
-            -1.0f,  1.0f, -1.0f, // 6
-             1.0f, -1.0f,  1.0f, // 7
-        };
-
-        unsigned int indices[] = {
-            0, 1, 2,
-            2, 0, 6,
-            6, 2, 4,
-            2, 4, 3,
-            4, 6, 0,
-            0, 4, 5,
-            1, 2, 7,
-            2, 7, 3,
-            0, 1, 7, 
-            7, 0, 5,
-            3, 4, 7,
-            4, 7, 5
-        };
-
-        VertexArray va;
-        VertexBuffer vb(positions, 8 * 3 * sizeof(float));
-
-        VertexBufferLayout layout;
-        layout.Push<float>(3);
-        va.AddBuffer(vb, layout);
-
-        IndexBuffer ib(indices, 12 * 3);
-
-        Shader shader("res/shaders/Basic.shader");
-        shader.Bind();
-        shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
-        shader.SetUniformMat4f("u_MVP", MVP);
-
-        va.Unbind();
-        vb.Unbind();
-        ib.Unbind();
-        shader.Unbind();
+        GLCall(glEnable(GL_BLEND));
+        GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
         Renderer renderer;
 
-        /* ---------- imgui ---------- */
         Init_IMGUI(window);
-        bool show_demo_window = true;
-        /* ---------- End ---------- */
 
-        float r = 0.0f;
-        float increment = 0.05f;
-
-        //GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE)); // W
-        //GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
-
-        // Habilidad el test de profundidad
-        //GLCall(glEnable(GL_DEPTH_TEST));
-        // Aceptar el fragmento si está más cerca de la cámara que el fragmento anterior
-        //GLCall(glDepthFunc(GL_LESS));
-        // Cull triangles which normal is not towards the camera
-        //GLCall(glEnable(GL_CULL_FACE));
+        test::TestClearColor test;
 
         while (!glfwWindowShouldClose(window) && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
         {
-            processInput(window);
-
             renderer.Clear();
+
+            test.OnUpdate(0.0f);
+            test.OnRender();
 
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            shader.Bind();
-            shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
-
-            MVP = camera.GetViewProjection();
-            /*MVP = glm::rotate(MVP, glm::radians(0.5f), glm::vec3(-1.0f, 0.0f, 0.0f));
-            MVP = glm::rotate(MVP, glm::radians(1.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-            MVP = glm::rotate(MVP, glm::radians(0.5f), glm::vec3(0.0f, 0.0f, -1.0f));*/
-            shader.SetUniformMat4f("u_MVP", MVP);
-
-            renderer.Draw(va, ib, shader);
-
-            if (r > 1.0f)
-                increment = -0.05f;
-            else if (r < 0.0f)
-                increment = 0.05f;
-
-            r += increment;
-
-            {
-
-            }
+            test.OnImGuiRender();
 
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -173,6 +85,10 @@ GLFWwindow* Init_GLFW()
     if (!glfwInit())
         return nullptr;
 
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
     window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Hello World", NULL, NULL);
     if (!window)
     {
@@ -181,12 +97,6 @@ GLFWwindow* Init_GLFW()
     }
 
     glfwMakeContextCurrent(window);
-
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    glfwSetCursorPosCallback(window, mouse_callback);
-    glfwSetScrollCallback(window, scroll_callback);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     glfwSwapInterval(5);
 
@@ -203,57 +113,11 @@ void Init_GLEW()
 
 void Init_IMGUI(GLFWwindow* window)
 {
-    IMGUI_CHECKVERSION();
+    //IMGUI_CHECKVERSION();
     ImGui::CreateContext();
 
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     //ImGui_ImplOpenGL3_Init(glsl_version);
 
     ImGui::StyleColorsDark();
-}
-
-void processInput(GLFWwindow* window)
-{
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(GLFW_KEY_W);
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(GLFW_KEY_S);
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(GLFW_KEY_A);
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(GLFW_KEY_D);
-}
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    GLCall(glViewport(0, 0, width, height));
-}
-
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
-    if (firstMouse)
-    {
-        lastX = xpos;
-        lastY = ypos;
-        firstMouse = false;
-    }
-
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
-
-    lastX = xpos;
-    lastY = ypos;
-
-    camera.ProcessMouseMovement(xoffset, yoffset);
-}
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-    camera.ProcessMouseScroll((float)xoffset, (float)yoffset);
-}
-
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-    if (button == GLFW_MOUSE_BUTTON_LEFT)
-        camera.ProcessMouseButton(button, action);
 }
