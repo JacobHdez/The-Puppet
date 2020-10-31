@@ -26,6 +26,7 @@ public:
 	Camera(const glm::vec3& pos, float fov, float aspect, float zNear, float zFar);
 
 	glm::mat4 GetViewProjection();
+	inline void SetAspect(float aspect) { Aspect = aspect; }
 
 	void ProcessKeyboard(unsigned int key);
 	void ProcessMouseMovement(float xoffset, float yoffset);

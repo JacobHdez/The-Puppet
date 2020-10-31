@@ -7,11 +7,10 @@
 #include "MouseButtonCodes.h"
 
 Camera::Camera()
-	: FoV(glm::pi<float>() * 0.25f), Aspect(4.0f / 3.0f), Near(0.1f), Far(100.0f)
+	: FoV(glm::pi<float>() * 0.25f), Aspect(4.0f / 3.0f), Near(0.1f), Far(1000.0f)
 {
-	//m_Perspective = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 100.0f);
 	m_Perspective = glm::perspective(FoV, Aspect, Near, Far);
-	m_Position = glm::vec3(0.0f, 0.0f, 5.0f);
+	m_Position = glm::vec3(0.0f, 0.0f, 10.0f);
 	m_Right = glm::vec3(0.0f, 0.0f, -1.0f);
 	m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
 }
