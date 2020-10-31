@@ -1,6 +1,10 @@
 #include "VertexBuffer.h"
 
 #include "Renderer.h"
+#include <limits.h>
+
+VertexBuffer::VertexBuffer()
+    : m_RendererID(UINT_MAX) {}
 
 VertexBuffer::VertexBuffer(const void* data, unsigned int size)
 {
@@ -11,7 +15,15 @@ VertexBuffer::VertexBuffer(const void* data, unsigned int size)
 
 VertexBuffer::~VertexBuffer()
 {
-    GLCall(glDeleteBuffers(1, &m_RendererID));
+    if (m_RendererID != UINT_MAX)
+        GLCall(glDeleteBuffers(1, &m_RendererID));
+}
+
+void VertexBuffer::Setup(const void* data, unsigned int size)
+{
+    GLCall(glGenBuffers(1, &m_RendererID));
+    GLCall(glBindBuffer(GL_ARRAY_BUFFER, m_RendererID));
+    GLCall(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
 }
 
 void VertexBuffer::Bind() const

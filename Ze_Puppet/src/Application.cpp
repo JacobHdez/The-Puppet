@@ -95,92 +95,36 @@ int main()
 
         Init_IMGUI(window);
 
-        test::TestPuppet Puppet("res/objects/test.obj");
-        //test::TestPuppet Puppet("res/objects/puppet.obj");
-        std::cout << "Puppet size = " << Puppet.m_objects.size() << std::endl;
-        /* ---------- Test ---------- */
-        /*float positions[] = {
-            -1.0f, -1.0f, -1.0f, // 0
-             1.0f, -1.0f, -1.0f, // 1
-             1.0f,  1.0f, -1.0f, // 2
-             1.0f,  1.0f,  1.0f, // 3
-            -1.0f,  1.0f,  1.0f, // 4
-            -1.0f, -1.0f,  1.0f, // 5
-            -1.0f,  1.0f, -1.0f, // 6
-             1.0f, -1.0f,  1.0f, // 7
-        };
+        test::TestPuppet Puppet("res/objects/puppet.obj");
 
-        unsigned int indices[] = {
-            0, 1, 2,
-            2, 0, 6,
-            6, 2, 4,
-            2, 4, 3,
-            4, 6, 0,
-            0, 4, 5,
-            1, 2, 7,
-            2, 7, 3,
-            0, 1, 7,
-            7, 0, 5,
-            3, 4, 7,
-            4, 7, 5
-        };*/
-        std::vector<float> positions = Puppet.m_objects[0].GetVertices();
-        std::vector<unsigned int> indices = Puppet.m_objects[0].GetIndices();
-
-        VertexArray va;
-        VertexBuffer vb(&positions[0], positions.size() * sizeof(float));
-
-        VertexBufferLayout layout;
-        layout.Push<float>(3);
-        va.AddBuffer(vb, layout);
-
-        IndexBuffer ib(&indices[0], indices.size());
-
-        /*glm::mat4 m_Perspective = glm::perspective(glm::pi<float>() * 0.25f, 4.0f / 3.0f, 0.1f, 1000.0f);
-        glm::vec3 m_Position = glm::vec3(0.0f, 0.0f, 5.0f);
-        glm::vec3 m_Right = glm::vec3(0.0f, 0.0f, -1.0f);
-        glm::vec3 m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
-        m_Perspective = m_Perspective* glm::lookAt(m_Position, m_Position + m_Right, m_Up);*/
+        GLCall(glEnable(GL_DEPTH_TEST));
+        GLCall(glDepthFunc(GL_LESS));
 
         Shader shader("res/shaders/Basic.shader");
         shader.Bind();
-        shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
-        //shader.SetUniformMat4f("u_MVP", m_Perspective);
+        shader.SetUniform4f("u_Color", 0.8f, 0.8f, 0.8f, 1.0f);
+        shader.SetUniformMat4f("u_MVP", MVP);
 
-        va.Unbind();
-        vb.Unbind();
-        ib.Unbind();
-        shader.Unbind();
-
-        Renderer renderer;
-
-        float r = 0.0f;
-        float increment = 0.05f;
-
-        //GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
-        /* ---------- End ---------- */
+        double lastTime = glfwGetTime();
+        int nbFrames = 0;
 
         while (!glfwWindowShouldClose(window) && glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS)
         {
+            double currentTime = glfwGetTime();
+            nbFrames++;
+            if (currentTime - lastTime >= 1.0) {
+                std::cout << (1000.0 / double(nbFrames)) << " ms/frame" << std::endl;
+                nbFrames = 0;
+                lastTime += 1.0;
+            }
+
             processInput(window);
-            renderer.Clear();
+            GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
-            shader.Bind();
-            shader.SetUniform4f("u_Color", r, 0.3f, 0.8f, 1.0f);
-
+            Puppet.OnUpdate(0.0f);
             MVP = camera.GetViewProjection();
             shader.SetUniformMat4f("u_MVP", MVP);
-
-            renderer.Draw(va, ib, shader);
-
-            if (r > 1.0f)
-                increment = -0.05f;
-            else if (r < 0.0f)
-                increment = 0.05f;
-
-            r += increment;
-            /*Puppet.OnUpdate(0.0f);
-            Puppet.OnRender();*/
+            Puppet.OnRender(shader);
 
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();

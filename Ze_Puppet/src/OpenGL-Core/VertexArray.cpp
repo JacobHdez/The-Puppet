@@ -2,15 +2,20 @@
 
 #include "VertexBufferLayout.h"
 #include "Renderer.h"
+#include <limits.h>
 
 VertexArray::VertexArray()
-{
-	GLCall(glGenVertexArrays(1, &m_RendererID));
-}
+	: m_RendererID(UINT_MAX) {}
 
 VertexArray::~VertexArray()
 {
-	GLCall(glDeleteVertexArrays(1, &m_RendererID));
+	if (m_RendererID != UINT_MAX)
+		GLCall(glDeleteVertexArrays(1, &m_RendererID));
+}
+
+void VertexArray::Setup()
+{
+	GLCall(glGenVertexArrays(1, &m_RendererID));
 }
 
 void VertexArray::AddBuffer(const VertexBuffer& vb, const VertexBufferLayout& layout)

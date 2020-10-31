@@ -24,6 +24,7 @@ bool loadOBJ(const std::string& filepath, std::vector<Mesh>& Objects)
 	float x, y, z;
 	unsigned int vInd, i;
 	bool firstOBJ = true;
+	unsigned int count = 0;
 
 	while (getline(stream, line))
 	{
@@ -39,6 +40,7 @@ bool loadOBJ(const std::string& filepath, std::vector<Mesh>& Objects)
 			else
 			{
 				Objects.push_back(Mesh(name, position, indices));
+				count += position.size() / 3.0f;
 				position.clear();
 				indices.clear();
 			}
@@ -62,7 +64,7 @@ bool loadOBJ(const std::string& filepath, std::vector<Mesh>& Objects)
 			{
 				ss >> vInd;
 				ss.ignore(line.size(), ' ');
-				vInd -= 1;
+				vInd -= 1 + count;
 				indices.push_back(vInd);
 			}
 		}
@@ -71,7 +73,6 @@ bool loadOBJ(const std::string& filepath, std::vector<Mesh>& Objects)
 		ss.clear();
 	}
 	Objects.push_back(Mesh(name, position, indices));
-	std::cout << Objects.size() << std::endl;
 
 	stream.close();
 	return true;
