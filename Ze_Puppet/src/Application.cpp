@@ -19,7 +19,7 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 Camera camera;
-glm::mat4 MVP = camera.GetViewProjection();
+glm::mat4 VP = camera.GetViewProjection();
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -48,7 +48,7 @@ int main()
 
         Init_IMGUI(window);
 
-        test::TestPuppet Puppet("res/objects/Owl.obj");
+        test::TestPuppet Puppet("res/objects/test.obj");
 
         /* ---------- Light ---------- */
         float positions[] = {
@@ -96,7 +96,7 @@ int main()
         Shader lightingShader("res/shaders/Lighting.shader");
         lightingShader.Bind();
         lightingShader.SetUniform4f("u_lightColor", 1.0f, 1.0f, 1.0f, 1.0f);
-        lightingShader.SetUniformMat4f("u_MVP", MVP * model);
+        lightingShader.SetUniformMat4f("u_MVP", VP * model);
 
         float r = 0.0f;
         float increment = 0.005f;
@@ -106,9 +106,10 @@ int main()
         shader.Bind();
         shader.SetUniform3f("u_objectColor", 1.0f, 0.5f, 0.31f); // Coral
         shader.SetUniform3f("u_lightColor", 1.0f, 1.0f, 1.0f);
-        shader.SetUniform3f("u_lightPos", lightPos.x, lightPos.y, lightPos.z);
-        shader.SetUniformMat4f("u_VP", MVP);
+        shader.SetUniformVec3f("u_lightPos", lightPos);
+        shader.SetUniformMat4f("u_VP", VP);
         shader.SetUniformMat4f("u_model", glm::mat4(1.0f));
+        shader.SetUniformVec3f("u_viewPos", camera.GetPosition());
 
         Renderer renderer;
 
@@ -129,18 +130,19 @@ int main()
 
             processInput(window);
             renderer.Clear();
-            MVP = camera.GetViewProjection();
+            VP = camera.GetViewProjection();
 
             Puppet.OnUpdate(0.0f);
 
             shader.Bind();
             shader.SetUniform3f("u_lightColor", r, 1.0f, 1.0f);
-            shader.SetUniformMat4f("u_VP", MVP);
+            shader.SetUniformMat4f("u_VP", VP);
+            shader.SetUniformVec3f("u_viewPos", camera.GetPosition());
             Puppet.OnRender(shader);
 
             lightingShader.Bind();
             lightingShader.SetUniform4f("u_lightColor", r, 1.0f, 1.0f, 1.0f);
-            lightingShader.SetUniformMat4f("u_MVP", MVP*model);
+            lightingShader.SetUniformMat4f("u_MVP", VP * model);
             renderer.Draw(va, ib, lightingShader);
 
             if (r > 1.0f)
