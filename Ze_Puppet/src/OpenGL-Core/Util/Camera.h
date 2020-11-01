@@ -1,6 +1,7 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include "glm/gtx/transform.hpp"
 
 class Camera
 {
@@ -25,8 +26,12 @@ public:
 	Camera();
 	Camera(const glm::vec3& pos, float fov, float aspect, float zNear, float zFar);
 
+	void SetAspect(float aspect);
+
 	glm::mat4 GetViewProjection();
-	inline void SetAspect(float aspect) { Aspect = aspect; }
+	glm::vec3 GetPosition();
+	glm::mat4 GetView();
+	glm::mat4 GetProjection();
 
 	void ProcessKeyboard(unsigned int key);
 	void ProcessMouseMovement(float xoffset, float yoffset);

@@ -24,10 +24,30 @@ Camera::Camera(const glm::vec3& pos, float fov, float aspect, float zNear, float
 	m_Up = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
+void Camera::SetAspect(float aspect)
+{
+	Aspect = aspect;
+	m_Perspective = glm::perspective(FoV, Aspect, Near, Far);
+}
+
 glm::mat4 Camera::GetViewProjection()
 {
-	m_Perspective = glm::perspective(FoV, Aspect, Near, Far);
 	return m_Perspective * glm::lookAt(m_Position, m_Position + m_Right, m_Up);
+}
+
+glm::vec3 Camera::GetPosition()
+{
+	return m_Position;
+}
+
+glm::mat4 Camera::GetView()
+{
+	return glm::lookAt(m_Position, m_Position + m_Right, m_Up);
+}
+
+glm::mat4 Camera::GetProjection()
+{
+	return m_Perspective;
 }
 
 void Camera::ProcessKeyboard(unsigned int key)
