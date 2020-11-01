@@ -48,7 +48,7 @@ int main()
 
         Init_IMGUI(window);
 
-        test::TestPuppet Puppet("res/objects/test_cube.obj");
+        test::TestPuppet Puppet("res/objects/Owl.obj");
 
         /* ---------- Light ---------- */
         float positions[] = {
@@ -106,9 +106,9 @@ int main()
         shader.Bind();
         shader.SetUniform3f("u_objectColor", 1.0f, 0.5f, 0.31f); // Coral
         shader.SetUniform3f("u_lightColor", 1.0f, 1.0f, 1.0f);
-        //shader.SetUniform3f("u_lightPos", lightPos.x, lightPos.y, lightPos.z);
-        shader.SetUniformMat4f("u_MVP", MVP);
-        //shader.SetUniformMat4f("u_Model", glm::mat4(1.0f));
+        shader.SetUniform3f("u_lightPos", lightPos.x, lightPos.y, lightPos.z);
+        shader.SetUniformMat4f("u_VP", MVP);
+        shader.SetUniformMat4f("u_model", glm::mat4(1.0f));
 
         Renderer renderer;
 
@@ -135,7 +135,7 @@ int main()
 
             shader.Bind();
             shader.SetUniform3f("u_lightColor", r, 1.0f, 1.0f);
-            shader.SetUniformMat4f("u_MVP", MVP);
+            shader.SetUniformMat4f("u_VP", MVP);
             Puppet.OnRender(shader);
 
             lightingShader.Bind();

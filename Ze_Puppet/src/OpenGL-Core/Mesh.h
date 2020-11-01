@@ -10,22 +10,29 @@
 
 #include "Renderer.h"
 
+struct Vertex
+{
+	float x, y, z;
+	float nx, ny, nz;
+};
+
+bool operator == (const Vertex& lVertex, const Vertex& rVertex);
+
 class Mesh
 {
 private:
 	std::string m_name;
-	std::vector<float> m_vertices;
-	std::vector<float> m_normals;
+	std::vector<Vertex> m_vertices;
 	std::vector<unsigned int> m_indices;
 
 	VertexArray m_va;
-	VertexBuffer m_vb, m_vnb;
+	VertexBuffer m_vb;
 	VertexBufferLayout m_layout;
 	IndexBuffer m_ib;
 
 	Renderer m_renderer;
 public:
-	Mesh(const std::string& name, const std::vector<float>& vertices, const std::vector<float>& normals, const std::vector<unsigned int>& indices);
+	Mesh(const std::string& name, const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices);
 
 	inline std::string GetName() const { return m_name; }
 

@@ -22,10 +22,10 @@ bool loadOBJ(const std::string& filepath, std::vector<Mesh>& Objects)
 	std::vector<float> position;
 	std::vector<float> normals;
 	std::vector<unsigned int> indices;
+	std::vector<Vertex> vertices;
 	float x, y, z;
-	unsigned int vInd, vnInd, i;
+	unsigned int vInd, vnInd, i, index;
 	bool firstOBJ = true;
-	unsigned int vCount = 0, vnCount = 0;
 
 	while (getline(stream, line))
 	{
@@ -39,10 +39,8 @@ bool loadOBJ(const std::string& filepath, std::vector<Mesh>& Objects)
 			}
 			else
 			{
-				Objects.push_back(Mesh(name, position, normals, indices));
-				vCount += position.size() / 3.0f;
-				vnCount += normals.size() / 3.0f;
-				position.clear();
+				Objects.push_back(Mesh(name, vertices, indices));
+				vertices.clear();
 				indices.clear();
 			}
 			name = line.substr(2);
@@ -76,18 +74,38 @@ bool loadOBJ(const std::string& filepath, std::vector<Mesh>& Objects)
 				ss.ignore(line.size(), '/');
 				ss.ignore(line.size(), '/');
 				ss >> vnInd;
-				vInd -= 1 + vCount;
-				vnInd -= 1 + vnCount;
-				indices.push_back(vInd);
-				//indices.push_back(vnInd);
+
+				vInd = (vInd - 1) * 3;
+				vnInd = (vnInd - 1) * 3;
+				Vertex vertex;
+				vertex.x = position[vInd];
+				vertex.y = position[vInd + 1];
+				vertex.z = position[vInd + 2];
+				vertex.nx = normals[vnInd];
+				vertex.ny = normals[vnInd + 1];
+				vertex.nz = normals[vnInd + 2];
+
+				getUniqueVertex(vertices, vertex, index);
+				indices.push_back(index);
 			}
 		}
 
 		ss.str("");
 		ss.clear();
 	}
-	Objects.push_back(Mesh(name, position, normals, indices));
+	Objects.push_back(Mesh(name, vertices, indices));
 
 	stream.close();
 	return true;
+}
+
+void getUniqueVertex(std::vector<Vertex>& vertices, const Vertex& vertex, unsigned int& index)
+{
+	index = 0;
+	for (auto& it : vertices)
+	{
+		if (it == vertex) return;
+		index++;
+	}
+	vertices.push_back(vertex);
 }
