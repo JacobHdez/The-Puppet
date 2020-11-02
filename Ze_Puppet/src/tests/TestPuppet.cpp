@@ -16,7 +16,6 @@ namespace test {
 		  m_Shader("res/shaders/Basic02.shader"), m_LightShader("res/shaders/Lighting.shader"),
 		  m_Camera(camera)
 	{
-		std::cout << "Puppet" << camera << std::endl;
 		if (!loadOBJ(filepath, m_Objects))
 		{
 			std::cout << "[-] Object error" << std::endl;

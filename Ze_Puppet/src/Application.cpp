@@ -44,7 +44,6 @@ int main()
 
         Init_IMGUI(window);
 
-        std::cout << "App" << &camera << std::endl;
         test::TestPuppet Puppet("res/objects/test.obj", &camera);
 
         double lastTime = glfwGetTime();
