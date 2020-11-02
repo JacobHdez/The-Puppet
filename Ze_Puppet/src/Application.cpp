@@ -8,9 +8,6 @@
 #include "imgui/imgui_impl_opengl3.h"
 
 #include "Renderer.h"
-
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
 #include "Util/Camera.h"
 
 #include "tests/TestPuppet.h"
@@ -19,7 +16,6 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 Camera camera;
-glm::mat4 VP = camera.GetViewProjection();
 float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
@@ -48,73 +44,8 @@ int main()
 
         Init_IMGUI(window);
 
-        test::TestPuppet Puppet("res/objects/test.obj");
-
-        /* ---------- Light ---------- */
-        float positions[] = {
-        -1.0f, -1.0f, -1.0f, // 0
-         1.0f, -1.0f, -1.0f, // 1
-         1.0f,  1.0f, -1.0f, // 2
-         1.0f,  1.0f,  1.0f, // 3
-        -1.0f,  1.0f,  1.0f, // 4
-        -1.0f, -1.0f,  1.0f, // 5
-        -1.0f,  1.0f, -1.0f, // 6
-         1.0f, -1.0f,  1.0f, // 7
-        };
-
-        unsigned int indices[] = {
-            0, 1, 2,
-            2, 0, 6,
-            6, 2, 4,
-            2, 4, 3,
-            4, 6, 0,
-            0, 4, 5,
-            1, 2, 7,
-            2, 7, 3,
-            0, 1, 7,
-            7, 0, 5,
-            3, 4, 7,
-            4, 7, 5
-        };
-
-        VertexArray va;
-        VertexBuffer vb(positions, 8 * 3 * sizeof(float));
-
-        VertexBufferLayout layout;
-        layout.Push<float>(3);
-        va.Setup();
-        va.AddBuffer(vb, layout);
-
-        IndexBuffer ib(indices, 12 * 3);
-
-        glm::vec3 lightPos(5.0f, 5.0f, 5.0f);
-
-        glm::mat4 model(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f));
-
-        Shader lightingShader("res/shaders/Lighting.shader");
-        lightingShader.Bind();
-        lightingShader.SetUniform4f("u_lightColor", 1.0f, 1.0f, 1.0f, 1.0f);
-        lightingShader.SetUniformMat4f("u_MVP", VP * model);
-
-        float r = 0.0f;
-        float increment = 0.005f;
-        /* ---------- End ---------- */
-
-        Shader shader("res/shaders/Basic02.shader");
-        shader.Bind();
-        shader.SetUniform3f("u_objectColor", 1.0f, 0.5f, 0.31f); // Coral
-        shader.SetUniform3f("u_lightColor", 1.0f, 1.0f, 1.0f);
-        shader.SetUniformVec3f("u_lightPos", lightPos);
-        shader.SetUniformMat4f("u_VP", VP);
-        shader.SetUniformMat4f("u_model", glm::mat4(1.0f));
-        shader.SetUniformVec3f("u_viewPos", camera.GetPosition());
-
-        Renderer renderer;
-
-        GLCall(glEnable(GL_DEPTH_TEST));
-        GLCall(glDepthFunc(GL_LESS));
+        std::cout << "App" << &camera << std::endl;
+        test::TestPuppet Puppet("res/objects/test.obj", &camera);
 
         double lastTime = glfwGetTime();
         int nbFrames = 0;
@@ -123,43 +54,25 @@ int main()
             double currentTime = glfwGetTime();
             nbFrames++;
             if (currentTime - lastTime >= 1.0) {
-                std::cout << (1000.0 / double(nbFrames)) << " ms/frame" << std::endl;
+                std::cout << (1000.0 / (double)nbFrames) << " ms/frame" << std::endl;
                 nbFrames = 0;
                 lastTime += 1.0;
             }
 
             processInput(window);
-            renderer.Clear();
-            VP = camera.GetViewProjection();
 
             Puppet.OnUpdate(0.0f);
-
-            shader.Bind();
-            shader.SetUniform3f("u_lightColor", r, 1.0f, 1.0f);
-            shader.SetUniformMat4f("u_VP", VP);
-            shader.SetUniformVec3f("u_viewPos", camera.GetPosition());
-            Puppet.OnRender(shader);
-
-            lightingShader.Bind();
-            lightingShader.SetUniform4f("u_lightColor", r, 1.0f, 1.0f, 1.0f);
-            lightingShader.SetUniformMat4f("u_MVP", VP * model);
-            renderer.Draw(va, ib, lightingShader);
-
-            if (r > 1.0f)
-                increment *= -1;
-            else if (r < 0.0f)
-                increment *= -1;
-
-            r += increment;
+            Puppet.OnRender();
 
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            //Puppet.OnImGuiRender();
+            Puppet.OnImGuiRender();
 
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 
             glfwSwapBuffers(window);
             glfwPollEvents();
@@ -173,7 +86,7 @@ int main()
     glfwDestroyWindow(window);
     glfwTerminate();
 
-    return 0;
+	return 0;
 }
 
 GLFWwindow* Init_GLFW()
@@ -201,7 +114,7 @@ GLFWwindow* Init_GLFW()
     glfwSetScrollCallback(window, scroll_callback);
     glfwSetMouseButtonCallback(window, mouse_button_callback);
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(2);
 
     return window;
 }
@@ -242,23 +155,23 @@ void processInput(GLFWwindow* window)
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     GLCall(glViewport(0, 0, width, height));
-    camera.SetAspect((float)width/height);
+    camera.SetAspect((float)width / height);
 }
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
     if (firstMouse)
     {
-        lastX = xpos;
-        lastY = ypos;
+        lastX = (float)xpos;
+        lastY = (float)ypos;
         firstMouse = false;
     }
 
-    float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos;
+    float xoffset = (float)xpos - lastX;
+    float yoffset = lastY - (float)ypos;
 
-    lastX = xpos;
-    lastY = ypos;
+    lastX = (float)xpos;
+    lastY = (float)ypos;
 
     camera.ProcessMouseMovement(xoffset, yoffset);
 }
