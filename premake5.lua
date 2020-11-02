@@ -33,6 +33,16 @@ project "Ze_Puppet"
 		"Dependencies/GLEW/include"
 	}
 
+	links
+	{
+		"glew32s.lib",
+		"glfw3.lib",
+		"opengl32.lib",
+		"User32.lib",
+		"Gdi32.lib",
+		"Shell32.lib"
+	}
+
 	filter "system:windows"
 		cppdialect "C++17"
 		staticruntime "On"
