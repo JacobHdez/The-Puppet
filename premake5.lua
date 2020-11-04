@@ -33,6 +33,12 @@ project "Ze_Puppet"
 		"Dependencies/GLEW/include"
 	}
 
+	libdirs
+	{
+		"Dependencies/GLEW/lib/Release/Win32",
+		"Dependencies/GLFW/lib-vc2019"
+	}
+
 	links
 	{
 		"glew32s.lib",
@@ -55,9 +61,9 @@ project "Ze_Puppet"
 		}
 
 	filter "configurations:Debug"
-		defines "P_DEBUG"
+		defines "DEBUG"
 		symbols "On"
 
 	filter "configurations:Release"
-		defines "P_RELEASE"
+		defines "RELEASE"
 		optimize "On"
