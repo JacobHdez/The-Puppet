@@ -8,24 +8,24 @@
 #include "Renderer.h"
 #include "Shader.h"
 #include "Util/Camera.h"
+#include "Util/Lighting.h"
+#include "glm/glm.hpp"
 
 namespace test {
 
 	class TestPuppet : public Test
 	{
 	private:
-		std::vector<Mesh> m_Objects;
-		float m_ObjectColor[3];
+		Renderer m_Renderer;
+		float m_ClearColor[3];
+
+		Lighting m_Lighting;
+		Camera* m_Camera;
 		Shader m_Shader;
 
-		float m_LightColor[3];
-		Shader m_LightShader;
-
-		float m_ClearColor[3];
-		Renderer m_Renderer;
-		Camera *m_Camera;
+		std::vector<Mesh> m_Objects;
 	public:
-		TestPuppet(const std::string& filepath, Camera *camera);
+		TestPuppet(Camera *camera);
 		~TestPuppet();
 
 		void OnUpdate(float deltaTime) override;

@@ -44,7 +44,7 @@ int main()
 
         Init_IMGUI(window);
 
-        test::TestPuppet Puppet("res/objects/test.obj", &camera);
+        test::TestPuppet Puppet(&camera);
 
         double lastTime = glfwGetTime();
         int nbFrames = 0;
