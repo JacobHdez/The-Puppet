@@ -14,6 +14,7 @@ protected:
 	glm::vec3 m_ModelScale;
 	glm::vec3 m_Colour;
 	std::vector<SceneNode*> m_Children;
+	glm::vec3 m_Pivot;
 public:
 	SceneNode();
 	SceneNode(Mesh* mesh, glm::vec3 colour);
@@ -39,4 +40,7 @@ public:
 
 	std::vector<SceneNode*>::const_iterator GetChildIteratorBegin() { return m_Children.begin(); }
 	std::vector<SceneNode*>::const_iterator GetChildIteratorEnd() { return m_Children.end(); }
+
+	glm::vec3 GetPivot() const { return m_Pivot; }
+	void SetPivot(glm::vec3 pivot) { m_Pivot = pivot; }
 };

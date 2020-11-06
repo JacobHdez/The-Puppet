@@ -21,6 +21,7 @@ namespace test {
 	private:
 		Renderer m_Renderer;
 		float m_ClearColor[3];
+		glm::vec3 m_Color;
 
 		Lighting m_Lighting;
 		Camera* m_Camera;
@@ -40,11 +41,18 @@ namespace test {
 					SceneNode* RightForearm;
 						SceneNode* RightHand;
 			SceneNode* Hip;
+				SceneNode* LeftThigh;
+					SceneNode* LeftCalf;
+						SceneNode* LeftFoot;
+				SceneNode* RightThigh;
+					SceneNode* RightCalf;
+						SceneNode* RightFoot;
 				
 
 		glm::vec3 m_Rotation;
 		glm::vec3 m_Translation;
 		glm::quat m_quaternion;
+		glm::vec3 m_Pivot;
 	public:
 		TestPuppet(Camera *camera);
 		~TestPuppet();
@@ -54,6 +62,7 @@ namespace test {
 		void OnImGuiRender() override;
 
 		void BuildPuppet();
+		void InitPuppet();
 		void DrawPuppet();
 		void DrawNode(SceneNode* sn);
 	};

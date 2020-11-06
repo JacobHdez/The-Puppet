@@ -1,15 +1,20 @@
 #include "SceneNode.h"
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+
 SceneNode::SceneNode()
 	: m_Parent(nullptr), m_Mesh(nullptr),
 	  m_WorldTransform{ 1.0f }, m_Transform{ 1.0f }, m_ModelScale{ 1.0f },
-	  m_Colour{ 0.7f, 0.7f, 0.7f }
+	  m_Colour{ 0.7f, 0.7f, 0.7f },
+	  m_Pivot{ 0.0f }
 {
 }
 
 SceneNode::SceneNode(Mesh* mesh, glm::vec3 colour)
 	: m_Parent(nullptr),
-	m_WorldTransform{ 1.0f }, m_Transform{ 1.0f }, m_ModelScale{ 1.0f }
+	  m_WorldTransform{ 1.0f }, m_Transform{ 1.0f }, m_ModelScale{ 1.0f },
+	  m_Pivot{ 0.0f }
 {
 	m_Mesh = mesh;
 	m_Colour = colour;
