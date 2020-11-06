@@ -302,11 +302,11 @@ namespace test {
 
 						ImGui::TreePop();
 					}
-					else if (ImGui::TreeNode("Left Thigh"))
+					else if (ImGui::TreeNode("Right Thigh"))
 					{
-						if (ImGui::TreeNode("LeftCalf"))
+						if (ImGui::TreeNode("Right Calf"))
 						{
-							if (ImGui::TreeNode("LeftFoot"))
+							if (ImGui::TreeNode("Right Foot"))
 							{
 								ImGui::Text("Updating ...");
 								ImGui::SliderFloat3("Rotation", glm::value_ptr(m_Rotation), -0.5f, 0.5f);
