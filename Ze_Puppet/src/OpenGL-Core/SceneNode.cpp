@@ -21,6 +21,7 @@ SceneNode::~SceneNode()
 	{
 		delete m_Children[i];
 	}
+	m_Children.clear();
 }
 
 void SceneNode::AddChild(SceneNode* sn)
@@ -42,7 +43,7 @@ void SceneNode::OnUpdate(float deltaTime)
 
 	for (auto& it : m_Children)
 	{
-		it->OnUpdate(0.0f);
+		it->OnUpdate(deltaTime);
 	}
 }
 

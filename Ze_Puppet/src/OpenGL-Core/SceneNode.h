@@ -37,6 +37,6 @@ public:
 	void OnUpdate(float deltaTime);
 	void Draw(Shader& shader);
 
-	/*std::vector<SceneNode*>::const_iterator GetChildIteratorBegin() { return m_Children.begin(); }
-	std::vector<SceneNode*>::const_iterator GetChildIteratorEnd() { return m_Children.end(); }*/
+	std::vector<SceneNode*>::const_iterator GetChildIteratorBegin() { return m_Children.begin(); }
+	std::vector<SceneNode*>::const_iterator GetChildIteratorEnd() { return m_Children.end(); }
 };

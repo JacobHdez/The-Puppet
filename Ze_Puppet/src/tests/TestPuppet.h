@@ -10,6 +10,9 @@
 #include "Util/Camera.h"
 #include "Util/Lighting.h"
 #include "glm/glm.hpp"
+#include "glm/gtc/quaternion.hpp"
+#include "glm/gtx/quaternion.hpp"
+#include "SceneNode.h"
 
 namespace test {
 
@@ -23,7 +26,25 @@ namespace test {
 		Camera* m_Camera;
 		Shader m_Shader;
 
-		std::vector<Mesh> m_Objects;
+		std::vector<Mesh> m_Objects; // Cube and Sphere
+
+		// Nodes
+		SceneNode* Torso;
+			SceneNode* Shoulders;
+				SceneNode* Neck;
+					SceneNode* Head;
+				SceneNode* UpperLeftArm;
+					SceneNode* LeftForearm;
+						SceneNode* LeftHand;
+				SceneNode* UpperRightArm;
+					SceneNode* RightForearm;
+						SceneNode* RightHand;
+			SceneNode* Hip;
+				
+
+		glm::vec3 m_Rotation;
+		glm::vec3 m_Translation;
+		glm::quat m_quaternion;
 	public:
 		TestPuppet(Camera *camera);
 		~TestPuppet();
@@ -31,6 +52,10 @@ namespace test {
 		void OnUpdate(float deltaTime) override;
 		void OnRender() override;
 		void OnImGuiRender() override;
+
+		void BuildPuppet();
+		void DrawPuppet();
+		void DrawNode(SceneNode* sn);
 	};
 
 }
